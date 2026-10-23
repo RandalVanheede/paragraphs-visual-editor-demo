@@ -5,56 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paragraphs Visual Editor demo</title>
 <style>
-:root {
-  --accent: #0b3fd1;
-  --ink: #1b1b1f;
-  --muted: #6b6b76;
-  --line: #d6d8e0;
-  --bg: #eef0f5;
-  --panel: #fff;
-  color-scheme: light;
-}
+:root { --accent: #0b3fd1; --ink: #1b1b1f; --muted: #6b6b76; --line: #d6d8e0; --bg: #e4e7ee; --panel: #fff; color-scheme: light; }
 * { box-sizing: border-box; }
-body { margin: 0; font: 15px/1.45 system-ui, sans-serif; color: var(--ink); background: var(--bg); height: 100vh; overflow: hidden; }
-button { font: inherit; cursor: pointer; }
-.app { display: grid; grid-template-columns: 340px 1fr; height: 100vh; }
-
-/* ---- Sidebar ---- */
-.side { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
-.side h1 { font-size: 1rem; margin: 0; padding: 14px 16px 8px; }
-.banner { margin: 0 12px 8px; padding: 10px; border-radius: 8px; background: #e3e9ff; border: 1px solid #b9c6f5; }
-.banner[hidden] { display: none; }
-.banner p { margin: 0 0 8px; font-weight: 600; }
-.btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: #fff; }
+html, body { height: 100%; }
+body { margin: 0; font: 15px/1.45 system-ui, sans-serif; color: var(--ink); background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+.btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: #fff; color: var(--ink); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn:disabled { opacity: .45; cursor: default; }
-.list { overflow: auto; padding: 4px 12px 12px; flex: 1; }
-.list ul { list-style: none; margin: 0; padding: 0; }
-.row { border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; padding: 8px 10px; background: #fff; }
-.row.sel { background: #e3e9ff; border-color: var(--accent); }
-.row .head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.num { background: var(--accent); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
-.name { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.type { color: var(--muted); font-size: 12px; }
-.count { border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; font-size: 12px; background: #fff; }
-.tools { display: flex; gap: 4px; margin-top: 8px; }
-.tools button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: #fff; }
-.tools .go { background: var(--accent); color: #fff; border-color: var(--accent); }
-.nested { margin: 6px 0 0 8px; padding-left: 8px; border-left: 2px solid var(--line); }
-.add { margin-top: 6px; padding: 4px 10px; border: 1px dashed var(--accent); border-radius: 6px; background: none; color: var(--accent); }
-.addtop { margin: 0 12px 12px; padding: 10px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; }
+.btn.text { border-color: transparent; background: none; color: var(--accent); }
+.btn:disabled { opacity: .4; cursor: default; }
 
-/* ---- Preview ---- */
-.stage { overflow: auto; padding: 28px 40px 80px; }
-.page { max-width: 880px; margin: 0 auto; background: #fff; box-shadow: 0 2px 16px #0002; padding: 28px; font-family: Georgia, serif; }
-.pv-p { position: relative; margin: 22px 0; outline: 1px dashed transparent; outline-offset: 4px; border-radius: 4px; transition: outline-color .15s; }
+/* ---- Admin chrome ---- */
+.top { height: 56px; flex: none; background: #fff; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 0 18px; z-index: 30; }
+.top .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); }
+.top b { font-size: 15px; }
+.pill { background: #c9f4dc; color: #0b5a2f; padding: 1px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.top .grow { flex: 1; }
+.work { position: relative; flex: 1; min-height: 0; }
+
+/* ---- Preview area ---- */
+.stage { position: absolute; inset: 0; overflow: auto; background: var(--bg); }
+.viewbar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 12; display: flex; gap: 8px; }
+.sizes, .zoom { display: flex; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 2px 10px #0002; overflow: hidden; margin: 0; padding: 0; }
+.sizes label { padding: 6px 14px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.sizes input { position: absolute; opacity: 0; }
+.sizes label:has(input:checked) { background: #e3e9ff; color: var(--accent); }
+.sizes label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+.zoom button { border: 0; background: none; padding: 6px 11px; font-weight: 600; font-size: 13px; min-width: 34px; }
+.zoom button + button { border-left: 1px solid var(--line); }
+.zoom button:hover { background: #f1f3f8; }
+.zoom button[aria-pressed=true] { background: #e3e9ff; color: var(--accent); }
+.zoom button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.zoom .lvl { font-variant-numeric: tabular-nums; min-width: 52px; }
+.zoomhelp { position: fixed; inset: 120px auto auto 50%; transform: translateX(-50%); margin: 0; width: min(22rem, calc(100vw - 32px)); padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: #fff; box-shadow: 0 8px 28px #0003; font-size: 14px; }
+.zoomhelp b { display: block; margin-bottom: 6px; }
+.zoomhelp dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; }
+.zoomhelp dt { font-weight: 600; } .zoomhelp dd { margin: 0; color: var(--muted); }
+.zoomhelp p { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+.shield { position: absolute; inset: 0; z-index: 11; cursor: grab; }
+.panning .shield { cursor: grabbing; }
+.panning .frame { transition: none; }
+.frame { margin: 0 auto; min-height: 100%; background: #fff; container-type: inline-size; transform-origin: 0 0; transition: transform .25s, width .25s; box-shadow: 0 0 0 1px #0001; padding: 64px 0 80px; }
+.page { max-width: 880px; margin: 0 auto; padding: 0 28px; font-family: Georgia, serif; }
+
+.pv-p { position: relative; margin: 22px 0; outline: 1px dashed transparent; outline-offset: 4px; border-radius: 4px; transition: outline-color .15s, box-shadow .25s, opacity .2s; }
+.dim .pv-p.active, .dim .pv-p.sel { z-index: 2; box-shadow: 0 0 0 100vmax rgba(24, 28, 64, .32); }
 .pv-p.active, .pv-p.sel { outline: 2px dashed var(--accent); }
 .pv-p.sel { outline-style: solid; }
-.pv-p > .tag { display: none; position: absolute; top: -26px; left: -4px; background: var(--accent); color: #fff; font: 12px/20px system-ui; padding: 0 8px; border-radius: 3px; z-index: 3; }
-.pv-p.active > .tag, .pv-p.sel > .tag { display: block; }
-.pv-p > .bar { display: none; position: absolute; top: -34px; right: -4px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 3px; z-index: 4; box-shadow: 0 2px 8px #0003; }
+.pv-p.off { opacity: .45; }
+.pv-p[hidden] { display: none; }
+.pv-p > .tag { display: none; position: absolute; top: -26px; left: -4px; background: var(--accent); color: #fff; font: 12px/20px system-ui; padding: 0 8px; border-radius: 3px; z-index: 3; white-space: nowrap; }
+.labels .pv-p.active > .tag, .labels .pv-p.sel > .tag { display: block; }
+.pv-p > .bar { display: none; position: absolute; top: -36px; right: -4px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 3px; z-index: 4; box-shadow: 0 2px 8px #0003; }
 .pv-p.active > .bar, .pv-p.sel > .bar { display: flex; }
-.bar button { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font-size: 13px; }
+.bar button { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font-size: 13px; padding: 0; }
+.bar button.go { background: var(--accent); color: #fff; border-color: var(--accent); }
+.bar button:disabled, .tools button:disabled { opacity: .35; cursor: default; }
 .ins { display: none; position: absolute; z-index: 4; width: 26px; height: 26px; border: 0; border-radius: 50%; background: var(--accent); color: #fff; font: 700 18px/26px system-ui; padding: 0; }
 .pv-p.active > .ins, .pv-p.sel > .ins { display: block; }
 .dir-v > .ins[data-where=before] { top: -13px; left: 50%; transform: translateX(-50%); }
@@ -63,7 +70,7 @@ button { font: inherit; cursor: pointer; }
 .dir-h > .ins[data-where=before] { left: -13px; }
 .dir-h > .ins[data-where=after] { right: -13px; }
 .hero { background: linear-gradient(120deg, #1d2b64, #8e2de2); color: #fff; padding: 44px 32px; border-radius: 6px; }
-.hero h2 { margin: 0 0 6px; font: 800 2.2rem/1.1 system-ui; }
+.hero h2 { margin: 0 0 6px; font: 800 2.2rem/1.1 system-ui; overflow-wrap: anywhere; }
 .pv-p .hero p { margin: 0; color: #fff; opacity: .9; }
 .pv-p h3 { font: 700 1.4rem system-ui; margin: 0 0 12px; }
 .cards { display: flex; gap: 20px; }
@@ -75,180 +82,408 @@ button { font: inherit; cursor: pointer; }
 .empty { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 8px; padding: 16px; text-align: center; font-family: system-ui; border: 1px dashed color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 8px; background: color-mix(in srgb, var(--accent) 3%, #fff); color: #6b6b76; }
 .empty small { font-size: 13px; color: #7c7c87; }
 .empty button { margin-top: 8px; padding: 6px 14px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, #fff); color: var(--accent); font-weight: 600; }
+@container (max-width: 640px) { .cards { flex-direction: column; } .hero h2 { font-size: 1.6rem; } .hero { padding: 28px 20px; } }
+
+/* ---- Sidebar (floats above the preview) ---- */
+.side { position: absolute; left: 12px; top: 12px; bottom: 12px; width: var(--sw, 340px); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 24px #0003; display: flex; flex-direction: column; z-index: 15; transition: transform .25s; min-height: 0; }
+.side.collapsed { transform: translateX(calc(-100% - 24px)); }
+.side header { display: flex; align-items: center; gap: 6px; padding: 12px 12px 8px 16px; }
+.side h1 { font-size: 1rem; margin: 0; flex: 1; }
+.icon { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 6px; background: #fff; padding: 0; }
+.icon:disabled { opacity: .4; cursor: default; }
+.openbtn { position: absolute; left: 12px; top: 12px; z-index: 14; display: none; box-shadow: 0 2px 10px #0002; }
+.collapsedmode .openbtn { display: block; }
+.resizer { position: absolute; top: 0; bottom: 0; right: -5px; width: 10px; cursor: ew-resize; }
+.resizer:hover, .resizer.drag { background: linear-gradient(90deg, transparent 4px, var(--accent) 4px, var(--accent) 6px, transparent 6px); }
+.banner { margin: 0 12px 8px; padding: 10px; border-radius: 8px; background: #e3e9ff; border: 1px solid #b9c6f5; }
+.banner[hidden] { display: none; }
+.banner p { margin: 0 0 8px; font-weight: 600; }
+.searchrow { display: flex; gap: 6px; margin: 0 12px; }
+.searchrow input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; }
+.crumb { margin: 6px 14px 0; font-size: 12px; color: var(--muted); min-height: 16px; }
+.crumb button { border: 0; background: none; color: var(--accent); text-decoration: underline; padding: 0; font-size: 12px; }
+.matches { margin: 4px 14px 0; font-size: 12px; color: var(--muted); }
+.list { overflow: auto; padding: 4px 12px 12px; flex: 1; }
+.list ul { list-style: none; margin: 0; padding: 0; }
+.list li[hidden] { display: none; }
+.row { border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; padding: 8px 10px; background: #fff; }
+.row.sel { background: #e3e9ff; border-color: var(--accent); }
+.row.dropok { outline: 2px solid var(--accent); }
+.row.dragging { opacity: .4; }
+.row .head { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.handle { color: var(--muted); cursor: grab; user-select: none; }
+.num { background: var(--accent); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
+.name { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row.unpub .name { text-decoration: line-through; color: var(--muted); }
+.type { color: var(--muted); font-size: 12px; }
+.badge { background: #eee; color: #555; border-radius: 999px; padding: 0 8px; font-size: 11px; margin-left: 6px; }
+.count { border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; font-size: 12px; background: #fff; }
+.tools { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+.tools button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: #fff; padding: 0; }
+.tools .go { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nested { margin: 6px 0 0 8px; padding-left: 8px; border-left: 2px solid var(--line); }
+.add { margin-top: 6px; padding: 4px 10px; border: 1px dashed var(--accent); border-radius: 6px; background: none; color: var(--accent); }
+.addtop { margin: 0 12px 12px; padding: 10px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; }
 
 /* ---- Edit panel ---- */
-.panel { position: fixed; top: 0; right: 0; bottom: 0; width: 380px; background: var(--panel); border-left: 1px solid var(--line); box-shadow: -6px 0 24px #0003; padding: 18px; overflow: auto; z-index: 20; transform: translateX(105%); transition: transform .2s; }
+.panel { position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 24px #0003; padding: 18px; overflow: auto; z-index: 16; transform: translateX(calc(100% + 24px)); transition: transform .25s; }
 .panel.open { transform: none; }
 .panel h2 { margin: 0 0 12px; font-size: 1.05rem; }
 .panel label { display: block; font-weight: 600; margin: 12px 0 4px; }
-.panel input, .panel textarea { width: 100%; padding: 8px; border: 1px solid #9aa0b0; border-radius: 6px; font: inherit; }
-.panel .live { color: var(--muted); font-size: 12px; margin-top: 4px; }
-.panel .actions { display: flex; gap: 8px; margin-top: 18px; }
+.panel input, .panel textarea { width: 100%; padding: 8px; border: 1px solid #9aa0b0; border-radius: 6px; }
+.panel .live { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.actions { display: flex; gap: 8px; margin-top: 18px; }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tile { text-align: left; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .tile b { display: block; } .tile span { color: var(--muted); font-size: 12px; }
 
+/* ---- Dialogs ---- */
+dialog { border: 0; border-radius: 14px; padding: 22px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 160px); overflow: auto; box-shadow: 0 12px 48px #0006; color: var(--ink); }
+dialog:not(:modal) { position: fixed; inset: 70px auto auto 50%; transform: translateX(-50%); z-index: 90; }
+dialog::backdrop { background: rgba(10, 14, 40, .45); }
+dialog h2 { margin: 0 0 6px; font-size: 1.15rem; }
+dialog .help { color: var(--muted); margin: 0 0 12px; }
+dialog fieldset { border: 1px solid var(--line); border-radius: 10px; margin: 0 0 12px; padding: 8px 12px 10px; }
+dialog legend { font-weight: 700; padding: 0 6px; }
+.opt { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; }
+.opt small { display: block; color: var(--muted); }
+dialog dl { display: grid; grid-template-columns: 9rem 1fr; gap: 2px 8px; margin: 8px 0 0; }
+dialog dt { font-weight: 700; } dialog dd { margin: 0; }
+dialog .foot { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+.targets { display: grid; gap: 6px; margin: 8px 0; }
+.targets button { text-align: left; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.targets button:hover { border-color: var(--accent); }
+dialog ul.changes { margin: 6px 0 12px; padding-left: 20px; max-height: 160px; overflow: auto; }
+dialog textarea { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px; }
+
 /* ---- Tour ---- */
-.tour { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); background: #14161f; color: #fff; border-radius: 12px; padding: 16px 18px; z-index: 50; box-shadow: 0 8px 32px #0007; }
+.tour { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); background: #14161f; color: #fff; border-radius: 12px; padding: 16px 18px; z-index: 100; box-shadow: 0 8px 32px #0007; }
+.tour[hidden] { display: none; }
 .tour h3 { margin: 0 0 4px; font-size: 1rem; }
 .tour p { margin: 0 0 12px; color: #d8dbe8; }
 .tour .nav { display: flex; gap: 8px; align-items: center; }
 .tour .nav .grow { flex: 1; color: #9aa0b8; font-size: 12px; }
 .tour .btn { background: #262a3a; border-color: #3a3f55; color: #fff; }
 .tour .btn.primary { background: #5b82ff; border-color: #5b82ff; }
-.tour-hl { box-shadow: 0 0 0 4px #ffb800, 0 0 0 9px #ffb80055 !important; border-radius: 8px; }
-.toast { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); background: #14161f; color: #fff; padding: 8px 14px; border-radius: 8px; z-index: 60; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.tour-hl { box-shadow: 0 0 0 4px #ffb800, 0 0 0 9px #ffb80055 !important; }
+.toast { position: fixed; top: 68px; right: 20px; background: #14161f; color: #fff; padding: 8px 14px; border-radius: 8px; z-index: 110; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .toast.on { opacity: 1; }
-@media (max-width: 900px) { .app { grid-template-columns: 1fr; } .side { max-height: 40vh; } .panel { width: 100%; } .cards { flex-direction: column; } }
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="side" aria-label="Structure">
-    <h1>Editing: Blocks <span class="type">(demo, nothing is saved)</span></h1>
+<div class="top"><span class="logo"></span><b>Visual editor demo page</b><span class="pill">Published</span><span class="grow"></span><span class="type">Static mock: nothing is saved</span></div>
+<div class="work labels dim" id="work">
+  <div class="stage" id="stage">
+    <div class="viewbar" id="viewbar"><fieldset class="sizes" id="sizes"><legend hidden>Preview size</legend>
+      <label title="Full width"><input type="radio" name="w" value="full" checked>Desktop</label>
+      <label title="Tablet, 768 px wide"><input type="radio" name="w" value="tablet">Tablet</label>
+      <label title="Phone, 390 px wide"><input type="radio" name="w" value="phone">Phone</label>
+    </fieldset>
+    <div class="zoom" role="group" aria-label="Zoom">
+      <button type="button" data-zoom="out" aria-label="Zoom out" title="Zoom out (Ctrl + scroll, or pinch)">−</button>
+      <button type="button" data-zoom="reset" class="lvl" title="Back to 100%">100%</button>
+      <button type="button" data-zoom="in" aria-label="Zoom in" title="Zoom in (Ctrl + scroll, or pinch)">+</button>
+      <button type="button" data-zoom="fit" aria-pressed="false" title="Fit the page into the free space">Fit</button>
+      <button type="button" popovertarget="zoomhelp" aria-label="How to zoom and move the preview" title="How to zoom and move the preview">?</button>
+    </div></div>
+    <div class="zoomhelp" id="zoomhelp" popover>
+      <b>Zoom and move the preview</b><dl>
+      <dt>Zoom</dt><dd>Ctrl/⌘ + scroll, pinch, or the − and + buttons</dd>
+      <dt>Move the page</dt><dd>Hold Space and drag, or drag with the middle mouse button</dd>
+      <dt>Move sideways</dt><dd>Swipe sideways</dd>
+      <dt>Back to normal</dt><dd>Click the percentage (100%), or Fit to see the whole width</dd></dl>
+      <p>The page itself scrolls as usual.</p>
+    </div>
+    <div class="frame" id="frame"><div class="page" id="page"></div></div>
+  </div>
+
+  <button class="icon openbtn" id="openSide" title="Show the sidebar" aria-label="Show the sidebar">»</button>
+  <aside class="side" id="side" aria-label="Structure">
+    <header>
+      <h1>Editing: Blocks</h1>
+      <button class="icon" id="gear" title="Viewing options" aria-label="Viewing options" aria-haspopup="dialog">⚙</button>
+      <button class="icon" id="collapse" title="Hide the sidebar" aria-label="Hide the sidebar">«</button>
+    </header>
     <div class="banner" id="banner" hidden>
       <p id="bannerText"></p>
       <button class="btn primary" id="save">Save</button>
       <button class="btn" id="discard">Discard</button>
-      <button class="btn" id="undo" title="Undo">↶ Undo</button>
     </div>
+    <div class="searchrow">
+      <input id="search" type="search" placeholder="Search paragraphs…" aria-label="Search paragraphs">
+      <button class="icon" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+      <button class="icon" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
+    </div>
+    <div class="crumb" id="crumb"></div>
+    <div class="matches" id="matches" role="status"></div>
     <div class="list" id="list"></div>
     <button class="addtop" id="addTop">Add paragraph</button>
+    <div class="resizer" id="resizer" title="Drag to resize"></div>
   </aside>
-  <main class="stage"><div class="page" id="page"></div></main>
+
+  <aside class="panel" id="panel" aria-live="polite"></aside>
 </div>
-<aside class="panel" id="panel" aria-live="polite"></aside>
+
+<dialog id="settings" aria-labelledby="sTitle"><form method="dialog">
+  <h2 id="sTitle">Viewing options</h2>
+  <p class="help">Outlined paragraphs are editable. The rest of the page is read-only context.</p>
+  <fieldset><legend>Outlines</legend>
+    <label class="opt"><input type="checkbox" data-opt="dim"><span>Dim the rest of the page</span></label>
+    <label class="opt"><input type="checkbox" data-opt="labels"><span>Show paragraph type labels</span></label>
+    <label class="opt"><input type="checkbox" data-opt="unpublished"><span>Show unpublished paragraphs (faded)<small>Visitors do not see them.</small></span></label>
+  </fieldset>
+  <fieldset><legend>Behaviour</legend>
+    <label class="opt"><input type="checkbox" data-opt="scroll"><span>Scroll the preview when clicking a paragraph here</span></label>
+    <label class="opt"><input type="checkbox" data-opt="shortcuts"><span>Single-key shortcuts (J, K, E, D, M, /, Delete)<small>Turn off if they clash with a screen reader or speech input. Ctrl/⌘ + Z stays on.</small></span></label>
+  </fieldset>
+  <details><summary>Keyboard shortcuts</summary><dl>
+    <dt>J / K</dt><dd>Next / previous paragraph</dd><dt>E</dt><dd>Edit the selected paragraph</dd>
+    <dt>D</dt><dd>Duplicate</dd><dt>M</dt><dd>Move to another place</dd><dt>Delete</dt><dd>Remove</dd>
+    <dt>Alt + ↑ / ↓</dt><dd>Move up / down</dd><dt>/</dt><dd>Search</dd>
+    <dt>Ctrl/⌘ + Z</dt><dd>Undo</dd><dt>Ctrl/⌘ + Shift + Z</dt><dd>Redo</dd>
+    <dt>Ctrl/⌘ + scroll</dt><dd>Zoom the preview (or pinch)</dd><dt>Space + drag</dt><dd>Move the preview</dd></dl></details>
+  <div class="foot"><button type="button" class="btn text" id="sReset">Reset to defaults</button><button class="btn primary" value="done">Done</button></div>
+</form></dialog>
+
+<dialog id="moveto" aria-labelledby="mTitle"><form method="dialog">
+  <h2 id="mTitle">Move to…</h2><p class="help" id="mHelp"></p>
+  <div class="targets" id="targets"></div>
+  <div class="foot"><span></span><button class="btn" value="cancel">Cancel</button></div>
+</form></dialog>
+
+<dialog id="savedlg" aria-labelledby="svTitle"><form method="dialog">
+  <h2 id="svTitle">Save changes</h2><p class="help">These changes are applied to the page once.</p>
+  <ul class="changes" id="changes"></ul>
+  <label class="opt"><input type="checkbox" id="rev" checked><span>Create new revision</span></label>
+  <label for="revlog" style="font-weight:600">Revision log message</label>
+  <textarea id="revlog" rows="2" placeholder="Describe the changes"></textarea>
+  <div class="foot"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="save" id="svGo">Save</button></div>
+</form></dialog>
+
 <div class="tour" id="tour" role="dialog" aria-label="Tour"></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  const clone = (x) => JSON.parse(JSON.stringify(x));
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   let seq = 0;
   const uid = () => `p${++seq}`;
 
-  // What each paragraph type has, and what a container may hold.
+  // ---- Model: what each type has, and what a container may hold ----
   const TYPES = {
     hero: { label: 'Hero', fields: { title: 'Title', sub: 'Subtitle' }, desc: 'Big banner with a title' },
     text: { label: 'Text', fields: { body: 'Body' }, desc: 'A block of text' },
-    cards: { label: 'Cards (nested)', fields: { title: 'Title' }, child: 'card', dir: 'h', desc: 'Cards side by side' },
-    accordion: { label: 'Accordion (nested)', fields: { title: 'Title' }, child: 'item', dir: 'v', desc: 'Questions and answers' },
+    cards: { label: 'Cards (nested)', fields: { title: 'Title' }, child: 'card', desc: 'Cards side by side' },
+    accordion: { label: 'Accordion (nested)', fields: { title: 'Title' }, child: 'item', desc: 'Questions and answers' },
     card: { label: 'Card', fields: { title: 'Title', body: 'Body' } },
     item: { label: 'Accordion item', fields: { title: 'Question', body: 'Answer' } },
   };
   const TOP = ['hero', 'text', 'cards', 'accordion'];
-  const make = (type, props = {}) => ({ id: uid(), type, props: { ...props }, kids: TYPES[type].child ? [] : null });
+  const make = (type, props = {}) => ({ id: uid(), type, pub: true, props: { ...props }, kids: TYPES[type].child ? [] : null });
+  const childLabel = (b) => TYPES[TYPES[b.type].child].label.toLowerCase();
+  const titleOf = (b) => b.props.title || b.props.body || TYPES[b.type].label;
+  const accepts = (parent, type) => (parent ? TYPES[parent.type].child === type : TOP.includes(type));
 
-  let blocks = [
-    make('hero', { title: 'Visual editing for Paragraphs', sub: 'Edit in the real theme' }),
-    make('text', { body: 'Hover a paragraph to see its tools. Everything you change shows up at once.' }),
-    make('cards', { title: 'Three cards' }),
-    make('accordion', { title: 'Frequently asked' }),
-  ];
-  const cards = blocks[2];
-  ['One', 'Two', 'Three'].forEach((n) => cards.kids.push(make('card', { title: `Card ${n}`, body: `Body text of card ${n.toLowerCase()}.` })));
-
+  const seed = () => {
+    const out = [
+      make('hero', { title: 'Visual editing for Paragraphs', sub: 'Edit in the real theme' }),
+      make('text', { body: 'Hover a paragraph to see its tools. Everything you change shows up at once.' }),
+      make('cards', { title: 'Three cards' }),
+      make('accordion', { title: 'Frequently asked' }),
+      make('accordion', { title: 'More questions' }),
+    ];
+    ['One', 'Two', 'Three'].forEach((n) => out[2].kids.push(make('card', { title: `Card ${n}`, body: `Body text of card ${n.toLowerCase()}.` })));
+    [['Is it free?', 'Yes.'], ['Does it work in Claro?', 'It works in any admin theme.']].forEach(([t, b]) => out[4].kids.push(make('item', { title: t, body: b })));
+    return out;
+  };
+  let blocks = seed();
   let saved = JSON.stringify(blocks);
-  let history = [];
-  let changes = 0;
-  let selected = null;
-  let active = null;
-  let editing = null; // { block, orig, temp, list, index }
-  let openGroups = new Set();
+  let log = [];                 // what the draft changed, for the Save dialog
+  let undoStack = []; let redoStack = [];
+  let selected = null; let active = null; let editing = null;
+  let openGroups = new Set(); let query = '';
 
-  const clone = (x) => JSON.parse(JSON.stringify(x));
+  // ---- Settings, kept per browser like the module does ----
+  const DEFAULTS = { zoom: 1, dim: true, labels: true, unpublished: true, scroll: true, shortcuts: true, size: 'full', sw: 340, collapsed: false };
+  let opt = { ...DEFAULTS };
+  const KEY = 'pve-demo';
+  try { Object.assign(opt, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* optional */ }
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify(opt)); } catch (e) { /* optional */ } };
+
   const find = (id, list = blocks, parent = null) => {
     for (let i = 0; i < list.length; i++) {
       if (list[i].id === id) return { block: list[i], list, index: i, parent };
-      if (list[i].kids) {
-        const hit = find(id, list[i].kids, list[i]);
-        if (hit) return hit;
-      }
+      if (list[i].kids) { const hit = find(id, list[i].kids, list[i]); if (hit) return hit; }
     }
     return null;
   };
-  const toast = (text) => {
-    const t = $('#toast'); t.textContent = text; t.classList.add('on');
-    clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800);
-  };
-  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
-  const titleOf = (b) => b.props.title || b.props.body || TYPES[b.type].label;
+  const within = (b, id) => b.id === id || (b.kids || []).some((k) => within(k, id));
+  const toast = (text) => { const t = $('#toast'); t.textContent = text; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); };
 
-  // Every change goes through here: undo history plus the draft counter.
-  const commit = (fn, label) => {
-    history.push({ blocks: clone(blocks), changes });
-    fn(); changes++; render();
-    if (label) toast(label);
+  // ---- History: every draft change is one undo step ----
+  const snap = () => ({ blocks: clone(blocks), log: [...log] });
+  const restore = (s) => { blocks = s.blocks; log = s.log; if (selected && !find(selected)) selected = null; };
+  const commit = (fn, label, before = snap()) => { undoStack.push(before); if (undoStack.length > 10) undoStack.shift(); redoStack = []; fn(); log.push(label); render(); toast(label); };
+  const undo = () => { if (editing) cancelEdit(); const s = undoStack.pop(); if (s) { redoStack.push(snap()); restore(s); render(); toast('Undone'); } };
+  const redo = () => { if (editing) cancelEdit(); const s = redoStack.pop(); if (s) { undoStack.push(snap()); restore(s); render(); toast('Redone'); } };
+
+  // ---- Actions every paragraph has, in the sidebar and in the preview ----
+  const actions = (b) => {
+    const at = find(b.id);
+    return [
+      { key: 'edit', icon: '✎', title: 'Edit', go: true, run: () => edit(b.id) },
+      { key: 'up', icon: '↑', title: 'Move up', off: at.index === 0, run: () => move(b.id, -1) },
+      { key: 'down', icon: '↓', title: 'Move down', off: at.index === at.list.length - 1, run: () => move(b.id, 1) },
+      { key: 'moveto', icon: '⇄', title: 'Move to…', run: () => moveTo(b.id) },
+      { key: 'dup', icon: '⧉', title: 'Duplicate', run: () => duplicate(b.id) },
+      { key: 'pub', icon: b.pub ? '●' : '○', title: b.pub ? 'Unpublish' : 'Publish', run: () => togglePub(b.id) },
+      { key: 'rm', icon: '✕', title: 'Remove', run: () => remove(b.id) },
+    ];
   };
+  const move = (id, d) => {
+    const at = find(id); const j = at.index + d;
+    if (j < 0 || j >= at.list.length) return;
+    commit(() => { const a = find(id); [a.list[a.index], a.list[j]] = [a.list[j], a.list[a.index]]; }, `Moved ${titleOf(at.block)} ${d < 0 ? 'up' : 'down'}`);
+  };
+  const remove = (id) => { const b = find(id).block; commit(() => { const a = find(id); a.list.splice(a.index, 1); if (selected && !find(selected)) selected = null; }, `Removed ${titleOf(b)}`); };
+  const togglePub = (id) => { const b = find(id).block; commit(() => { b.pub = !b.pub; }, `${b.pub ? 'Unpublished' : 'Published'} ${titleOf(b)}`); };
+  const fresh = (b) => { const c = clone(b); const walk = (x) => { x.id = uid(); (x.kids || []).forEach(walk); }; walk(c); return c; };
+  const duplicate = (id) => {
+    const at = find(id); const copy = fresh(at.block);
+    commit(() => { const a = find(id); a.list.splice(a.index + 1, 0, copy); selected = copy.id; }, `Duplicated ${titleOf(at.block)}`);
+  };
+  // "Move to…": every list that accepts this type, the keyboard path next to drag and drop.
+  const targetsFor = (b) => {
+    const out = [];
+    if (accepts(null, b.type)) out.push({ parent: null, label: 'Top level (Blocks)' });
+    const walk = (list, trail) => list.forEach((x) => {
+      if (x.kids && !within(b, x.id) && accepts(x, b.type)) out.push({ parent: x, label: [...trail, titleOf(x)].join(' › ') });
+      if (x.kids) walk(x.kids, [...trail, titleOf(x)]);
+    });
+    walk(blocks, []);
+    return out;
+  };
+  const moveTo = (id, modeless = false) => {
+    if (editing && !leave()) return;
+    const b = find(id).block; const dlg = $('#moveto'); const box = $('#targets'); box.replaceChildren();
+    $('#mHelp').textContent = `Where should “${titleOf(b)}” go? It goes to the end of the list.`;
+    const options = targetsFor(b);
+    options.forEach((t) => {
+      const x = el('button', '', t.label); x.type = 'button';
+      x.addEventListener('click', () => { dlg.close(); relocate(id, t.parent, null, `Moved ${titleOf(b)} to ${t.label}`); });
+      box.append(x);
+    });
+    if (!options.length) box.append(el('p', 'help', 'There is nowhere else this paragraph may go.'));
+    modeless ? dlg.show() : dlg.showModal();
+  };
+  // index null = the end of the list.
+  const relocate = (id, parent, index, label) => commit(() => {
+    const at = find(id); at.list.splice(at.index, 1);
+    const list = parent ? parent.kids : blocks;
+    list.splice(index === null ? list.length : Math.min(index, list.length), 0, at.block);
+    if (parent) openGroups.add(parent.id);
+    selected = id;
+  }, label);
 
   // ---- Sidebar ----
-  const rowFor = (b, n, parentField) => {
-    const li = el('li');
-    const row = el('div', `row${selected === b.id ? ' sel' : ''}`);
-    row.dataset.row = b.id;
+  const matches = (b, q) => `${titleOf(b)} ${TYPES[b.type].label}`.toLowerCase().includes(q);
+  const shows = (b, q) => !q || matches(b, q) || (b.kids || []).some((k) => shows(k, q));
+  const rowFor = (b, n, q) => {
+    const li = el('li'); li.hidden = !shows(b, q);
+    const row = el('div', `row${selected === b.id ? ' sel' : ''}${b.pub ? '' : ' unpub'}`);
+    row.dataset.row = b.id; row.draggable = true;
     const head = el('div', 'head');
-    if (n) head.append(el('span', 'num', n));
-    const name = el('span', 'name', titleOf(b));
-    head.append(name);
+    head.append(el('span', 'handle', '⠿'));
+    let open = false;
     if (b.kids) {
-      const tw = el('button', 'count', `${openGroups.has(b.id) ? '▾' : '▸'} ${b.kids.length}`);
-      tw.title = 'Show or hide the nested paragraphs';
+      open = openGroups.has(b.id) || Boolean(q && b.kids.some((k) => shows(k, q)));
+      const tw = el('button', 'count', `${open ? '▾' : '▸'} ${b.kids.length}`);
+      tw.title = 'Show or hide the nested paragraphs'; tw.setAttribute('aria-expanded', String(open));
       tw.addEventListener('click', (e) => { e.stopPropagation(); openGroups.has(b.id) ? openGroups.delete(b.id) : openGroups.add(b.id); render(); });
-      head.prepend(tw);
+      head.append(tw);
     }
-    row.append(head, el('div', 'type', TYPES[b.type].label));
-    head.addEventListener('click', () => select(b.id));
+    if (n) head.append(el('span', 'num', n));
+    head.append(el('span', 'name', titleOf(b)));
+    row.append(head);
+    const sub = el('div', 'type', TYPES[b.type].label);
+    if (!b.pub) sub.append(el('span', 'badge', 'Unpublished'));
+    row.append(sub);
+    head.addEventListener('click', () => select(b.id, true));
+    row.addEventListener('mouseenter', () => setActive(b.id));
+    row.addEventListener('mouseleave', () => setActive(null));
     if (selected === b.id) {
       const tools = el('div', 'tools');
-      [['✎', 'Edit', 'go', () => edit(b.id)], ['↑', 'Move up', '', () => move(b.id, -1)], ['↓', 'Move down', '', () => move(b.id, 1)], ['✕', 'Remove', '', () => remove(b.id)]]
-        .forEach(([t, title, cls, fn]) => { const x = el('button', cls, t); x.title = title; x.setAttribute('aria-label', title); x.addEventListener('click', fn); tools.append(x); });
+      actions(b).forEach((a) => { const x = el('button', a.go ? 'go' : '', a.icon); x.title = a.title; x.setAttribute('aria-label', a.title); x.disabled = Boolean(a.off); x.dataset.act = a.key; x.addEventListener('click', a.run); tools.append(x); });
       row.append(tools);
     }
-    if (b.kids && openGroups.has(b.id)) {
+    if (b.kids && open) {
       const ul = el('ul', 'nested');
-      b.kids.forEach((k, i) => ul.append(rowFor(k, 0)));
-      const add = el('button', 'add', `+ Add ${TYPES[TYPES[b.type].child].label.toLowerCase()}s`);
+      b.kids.forEach((k) => ul.append(rowFor(k, 0, q)));
+      const add = el('button', 'add', `+ Add ${childLabel(b)}s`);
       add.addEventListener('click', () => addTo(b.id, b.kids.length));
-      ul.append(add);
-      row.append(ul);
+      ul.append(add); row.append(ul);
     }
     li.append(row);
     return li;
   };
+  // Drag and drop between lists: only where the type is allowed.
+  let dragId = null;
+  $('#list').addEventListener('dragstart', (e) => { const r = e.target.closest('.row'); if (!r) return; dragId = r.dataset.row; e.dataTransfer.setData('text/plain', dragId); r.classList.add('dragging'); });
+  $('#list').addEventListener('dragend', () => { dragId = null; $$('.dragging, .dropok').forEach((n) => n.classList.remove('dragging', 'dropok')); });
+  const dropTarget = (e) => {
+    const r = e.target.closest('.row'); if (!r || !dragId || r.dataset.row === dragId) return null;
+    const drag = find(dragId).block; const at = find(r.dataset.row);
+    if (within(drag, at.block.id) || !accepts(at.parent, drag.type)) return null;
+    const rect = r.getBoundingClientRect();
+    return { r, at, drag, after: e.clientY > rect.top + (rect.height / 2) };
+  };
+  $('#list').addEventListener('dragover', (e) => { $$('.dropok').forEach((n) => n.classList.remove('dropok')); const t = dropTarget(e); if (t) { e.preventDefault(); t.r.classList.add('dropok'); } });
+  $('#list').addEventListener('drop', (e) => {
+    const t = dropTarget(e); if (!t) return; e.preventDefault();
+    relocate(t.drag.id, t.at.parent, t.at.index + (t.after ? 1 : 0), `Moved ${titleOf(t.drag)} (drag and drop)`);
+  });
+
+  const crumb = () => {
+    const box = $('#crumb'); box.replaceChildren();
+    if (!selected || !find(selected)) return;
+    const chain = []; let a = find(selected);
+    while (a) { chain.unshift(a.block); a = a.parent ? find(a.parent.id) : null; }
+    chain.forEach((b, i) => {
+      if (i) box.append(' › ');
+      if (i === chain.length - 1) box.append(titleOf(b));
+      else { const x = el('button', '', titleOf(b)); x.addEventListener('click', () => select(b.id, true)); box.append(x); }
+    });
+  };
 
   // ---- Preview ----
-  const preview = (b, dir) => {
-    const p = el('div', `pv-p dir-${dir} ${b.type}${selected === b.id ? ' sel' : ''}${active === b.id ? ' active' : ''}`);
-    p.dataset.id = b.id;
-    p.append(el('span', 'tag', TYPES[b.type].label));
+  const preview = (b) => {
+    const p = el('div', `pv-p ${b.type}${b.pub ? '' : ' off'}${selected === b.id ? ' sel' : ''}${active === b.id ? ' active' : ''}`);
+    p.dataset.id = b.id; p.hidden = !b.pub && !opt.unpublished;
+    p.append(el('span', 'tag', TYPES[b.type].label + (b.pub ? '' : ' (unpublished)')));
     const bar = el('div', 'bar');
-    [['✎', 'Edit', () => edit(b.id)], ['↑', 'Move up', () => move(b.id, -1)], ['↓', 'Move down', () => move(b.id, 1)], ['✕', 'Remove', () => remove(b.id)]]
-      .forEach(([t, title, fn]) => { const x = el('button', '', t); x.title = title; x.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); bar.append(x); });
+    actions(b).forEach((a) => { const x = el('button', a.go ? 'go' : '', a.icon); x.title = a.title; x.setAttribute('aria-label', a.title); x.disabled = Boolean(a.off); x.addEventListener('click', (e) => { e.stopPropagation(); a.run(); }); bar.append(x); });
     p.append(bar);
     ['before', 'after'].forEach((where) => {
-      const x = el('button', 'ins', '+'); x.dataset.where = where; x.title = 'Add paragraph here';
-      x.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const at = find(b.id);
-        addTo(at.parent ? at.parent.id : null, at.index + (where === 'after' ? 1 : 0));
-      });
+      const x = el('button', 'ins', '+'); x.dataset.where = where; x.title = 'Add paragraph here'; x.setAttribute('aria-label', `Add paragraph ${where}`);
+      x.addEventListener('click', (e) => { e.stopPropagation(); const at = find(b.id); addTo(at.parent ? at.parent.id : null, at.index + (where === 'after' ? 1 : 0)); });
       p.append(x);
     });
-    const body = el('div', 'txt');
-    const { props } = b;
+    const body = el('div', 'txt'); const { props } = b;
     if (b.type === 'hero') { const h = el('div', 'hero'); h.append(el('h2', '', props.title || ''), el('p', '', props.sub || '')); body.append(h); }
     else if (b.type === 'text') body.append(el('p', '', props.body || ''));
-    else if (b.type === 'card' || b.type === 'item') { body.append(el('h4', '', props.title || ''), el('p', '', props.body || '')); }
+    else if (!b.kids) body.append(el('h4', '', props.title || ''), el('p', '', props.body || ''));
     else {
       body.append(el('h3', '', props.title || ''));
       const wrap = el('div', b.type === 'cards' ? 'cards' : 'items');
-      b.kids.forEach((k) => wrap.append(preview(k, TYPES[b.type].dir)));
+      b.kids.forEach((k) => wrap.append(preview(k)));
       if (!b.kids.length) {
         const e = el('div', 'empty');
-        e.append(el('strong', '', `No ${TYPES[TYPES[b.type].child].label.toLowerCase()}s yet`),
-          el('small', '', 'A placeholder for the editor: it is not shown on the published page.'));
-        const add = el('button', '', `+ Add ${TYPES[TYPES[b.type].child].label.toLowerCase()}s`);
-        add.addEventListener('click', (e2) => { e2.stopPropagation(); addTo(b.id, 0); });
+        e.append(el('strong', '', `No ${childLabel(b)}s yet`), el('small', '', 'A placeholder for the editor: it is not shown on the published page.'));
+        const add = el('button', '', `+ Add ${childLabel(b)}s`); add.addEventListener('click', (e2) => { e2.stopPropagation(); addTo(b.id, 0); });
         e.append(add); wrap.append(e);
       }
       body.append(wrap);
@@ -257,172 +492,326 @@ button { font: inherit; cursor: pointer; }
     return p;
   };
 
+  // "+" go left/right of paragraphs that sit side by side, above/below otherwise.
+  const dirs = () => $$('.pv-p').forEach((p) => {
+    const sib = [...p.parentElement.children].filter((c) => c.classList.contains('pv-p') && !c.hidden);
+    let row;
+    if (sib.length > 1) {
+      const a = p.getBoundingClientRect(); const o = sib[sib.indexOf(p) === 0 ? 1 : 0].getBoundingClientRect();
+      row = Math.min(a.bottom, o.bottom) - Math.max(a.top, o.top) > Math.min(a.height, o.height) / 2;
+    } else {
+      const s = getComputedStyle(p.parentElement); row = s.display.includes('flex') && s.flexDirection.startsWith('row');
+    }
+    p.classList.toggle('dir-h', row); p.classList.toggle('dir-v', !row);
+  });
+
   const render = () => {
-    const list = $('#list'); const ul = el('ul');
-    blocks.forEach((b, i) => ul.append(rowFor(b, i + 1)));
-    list.replaceChildren(ul);
-    const page = $('#page');
-    const keep = page.parentElement.scrollTop;
-    page.replaceChildren(...blocks.map((b) => preview(b, 'v')));
-    page.parentElement.scrollTop = keep;
-    $('#banner').hidden = !changes;
-    $('#bannerText').textContent = `Draft: ${changes} unsaved change${changes === 1 ? '' : 's'}.`;
-    $('#undo').disabled = !history.length;
+    const q = query.trim().toLowerCase();
+    const ul = el('ul'); blocks.forEach((b, i) => ul.append(rowFor(b, i + 1, q)));
+    $('#list').replaceChildren(ul);
+    const n = q ? $$('.row', $('#list')).filter((r) => matches(find(r.dataset.row).block, q)).length : 0;
+    $('#matches').textContent = q ? `${n} match${n === 1 ? '' : 'es'}` : '';
+    crumb();
+    const stage = $('#stage'); const keep = stage.scrollTop;
+    $('#page').replaceChildren(...blocks.map(preview));
+    stage.scrollTop = keep;
+    $('#banner').hidden = !log.length;
+    $('#bannerText').textContent = `Draft: ${log.length} unsaved change${log.length === 1 ? '' : 's'}.`;
+    $('#undo').disabled = !undoStack.length; $('#redo').disabled = !redoStack.length;
+    dirs(); layout();
   };
 
-  // Hover in the preview activates the innermost paragraph.
-  $('#page').addEventListener('mouseover', (e) => {
-    const p = e.target.closest('.pv-p');
-    const id = p ? p.dataset.id : null;
-    if (id !== active) { setActive(id); }
+  // ---- Layout: floating panels, preview size, zoom and pan ----
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const ZOOM_STEPS = [0.25, 0.33, 0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 2];
+  let pan = { x: 0, y: 0 };
+  let cur = { left: 0, s: 1 };  // where the page is drawn now (window x, scale)
+  let free = { L: 0, R: 0 };
+  const layout = () => {
+    const work = $('#work'); const frame = $('#frame'); const W = work.clientWidth;
+    work.classList.toggle('collapsedmode', opt.collapsed);
+    ['dim', 'labels'].forEach((k) => work.classList.toggle(k, opt[k]));
+    $('#side').classList.toggle('collapsed', opt.collapsed);
+    $('#side').style.setProperty('--sw', `${opt.sw}px`);
+    const fw = { full: W, tablet: Math.min(768, W), phone: Math.min(390, W) }[opt.size];
+    frame.style.width = `${fw}px`;
+    const L = (opt.collapsed ? 0 : opt.sw + 12) + 24;
+    const R = W - ($('#panel').classList.contains('open') ? 392 : 0) - 12;
+    const avail = R - L; free = { L, R };
+    const natural = (W - fw) / 2;
+    const s = opt.zoom === 'fit' ? clamp(avail / fw, 0.4, 1) : opt.zoom;
+    // Fits: centred in the free space. Wider: a full-width page starts at the
+    // window's edge (under the sidebar), a narrower size at the sidebar.
+    let target = fw * s <= avail ? L + ((avail - fw * s) / 2) : (opt.size === 'full' ? 0 : L);
+    // Keep the selected paragraph between the sidebar and the edit panel.
+    let shift = 0;
+    const n = selected && opt.zoom !== 'fit' && $(`.pv-p[data-id="${selected}"]`);
+    if (n && n.offsetParent) {
+      const fr = frame.getBoundingClientRect(); const r = n.getBoundingClientRect();
+      const left = target + pan.x + ((r.left - fr.left) / cur.s) * s;
+      const right = target + pan.x + ((r.right - fr.left) / cur.s) * s;
+      shift = right - left > avail ? L - left : (left < L ? L - left : (right > R ? R - right : 0));
+    }
+    pan.x = clamp(pan.x, L + 120 - fw * s - target, R - 120 - target);
+    pan.y = clamp(pan.y, -400, 400);
+    cur = { left: target + pan.x + shift, s };
+    frame.style.transform = `translate(${Math.round(cur.left - natural)}px, ${Math.round(pan.y)}px) scale(${s})`;
+    // Taller when zoomed out, so the page still fills the height.
+    frame.style.minHeight = `${100 / s}%`;
+    $('.zoom .lvl').textContent = `${Math.round(s * 100)}%`;
+    $('.zoom .lvl').setAttribute('aria-label', `Zoom ${Math.round(s * 100)}%, reset to 100%`);
+    $('[data-zoom=fit]').setAttribute('aria-pressed', String(opt.zoom === 'fit'));
+  };
+  // Zoom, keeping the point `at` (window coordinates) where it is: sideways
+  // by panning, up and down by scrolling.
+  const setZoom = (next, at) => {
+    const before = { ...cur }; const frame = $('#frame'); const stage = $('#stage');
+    const top = frame.getBoundingClientRect().top;
+    opt.zoom = next === 'fit' ? 'fit' : clamp(next, 0.25, 2); store();
+    if (next === 'fit') pan = { x: 0, y: 0 };
+    layout();
+    if (at && next !== 'fit') {
+      const u = (at.x - before.left) / before.s; const v = (at.y - top) / before.s;
+      pan.x += at.x - (u * cur.s) - cur.left; layout();
+      stage.scrollTop += v * (cur.s - before.s);
+    }
+  };
+  const zoomStep = (dir) => {
+    const next = dir > 0 ? ZOOM_STEPS.find((z) => z > cur.s + 0.001) : [...ZOOM_STEPS].reverse().find((z) => z < cur.s - 0.001);
+    setZoom(next || (dir > 0 ? 2 : 0.25), { x: (free.L + free.R) / 2, y: $('#stage').getBoundingClientRect().top + 200 });
+  };
+  const panBy = (dx, dy) => { pan.x += dx; pan.y += dy; layout(); };
+  $$('[data-zoom]').forEach((b) => b.addEventListener('click', () => {
+    const a = b.dataset.zoom;
+    if (a === 'in' || a === 'out') zoomStep(a === 'in' ? 1 : -1);
+    else { pan = { x: 0, y: 0 }; setZoom(a === 'fit' ? 'fit' : 1); }
+  }));
+  // Pinch / Ctrl + wheel zooms around the pointer; a sideways swipe pans.
+  $('#stage').addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) { e.preventDefault(); setZoom(cur.s * Math.exp(-clamp(e.deltaY, -30, 30) * 0.005), { x: e.clientX, y: e.clientY }); }
+    else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { e.preventDefault(); panBy(-e.deltaX, 0); }
+  }, { passive: false });
+  // Space + drag, or middle-drag: a shield over the page takes the pointer.
+  let shield = null; let spaceHeld = false;
+  const grab = (on) => {
+    spaceHeld = on;
+    if (on && !shield) {
+      shield = el('div', 'shield'); let last = null;
+      shield.addEventListener('pointerdown', (e) => { last = { x: e.clientX, y: e.clientY }; shield.setPointerCapture(e.pointerId); $('#work').classList.add('panning'); });
+      shield.addEventListener('pointermove', (e) => { if (last) { panBy(e.clientX - last.x, e.clientY - last.y); last = { x: e.clientX, y: e.clientY }; } });
+      const end = () => { last = null; $('#work').classList.remove('panning'); if (!spaceHeld) grab(false); };
+      shield.addEventListener('pointerup', end); shield.addEventListener('pointercancel', end);
+      $('#stage').append(shield);
+    } else if (!on && shield && !$('#work').classList.contains('panning')) { shield.remove(); shield = null; }
+  };
+  const pressable = (t) => Boolean(t.closest && t.closest('button, a, summary, input, select, textarea, label, [contenteditable]'));
+  document.addEventListener('keydown', (e) => { if (e.key === ' ' && !e.repeat && !pressable(e.target) && !document.querySelector('dialog[open]')) { e.preventDefault(); grab(true); } });
+  document.addEventListener('keyup', (e) => { if (e.key === ' ') grab(false); });
+  window.addEventListener('blur', () => grab(false));
+  $('#stage').addEventListener('pointerdown', (e) => {
+    if (e.button !== 1) return;
+    e.preventDefault(); let last = { x: e.clientX, y: e.clientY }; $('#work').classList.add('panning');
+    const move = (ev) => { panBy(ev.clientX - last.x, ev.clientY - last.y); last = { x: ev.clientX, y: ev.clientY }; };
+    const up = () => { $('#work').classList.remove('panning'); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
   });
+  window.addEventListener('resize', () => { layout(); dirs(); });
+
+  // ---- Selecting and hovering ----
+  const setActive = (id) => { active = id; $$('.pv-p').forEach((n) => n.classList.toggle('active', n.dataset.id === id)); };
+  const select = (id, fromSidebar = false) => {
+    if (editing && (!id || editing.block.id !== id) && !leave()) return;
+    selected = id; render();
+    const n = id && $(`.pv-p[data-id="${id}"]`);
+    if (n && (!fromSidebar || opt.scroll)) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    setTimeout(layout, 350);
+  };
+  $('#page').addEventListener('mouseover', (e) => { const p = e.target.closest('.pv-p'); const id = p ? p.dataset.id : null; if (id !== active) setActive(id); });
   $('#page').addEventListener('mouseleave', () => setActive(null));
   $('#page').addEventListener('click', (e) => { const p = e.target.closest('.pv-p'); if (p) select(p.dataset.id); });
-  const setActive = (id) => {
-    active = id;
-    document.querySelectorAll('.pv-p').forEach((n) => n.classList.toggle('active', n.dataset.id === id));
-  };
-  const select = (id) => {
-    if (editing && editing.block.id !== id && !leave()) return;
-    selected = id; render();
-    const n = $(`.pv-p[data-id="${id}"]`); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  };
 
-  // ---- Actions ----
-  const move = (id, d) => commit(() => {
-    const at = find(id); const j = at.index + d;
-    if (j < 0 || j >= at.list.length) return;
-    [at.list[at.index], at.list[j]] = [at.list[j], at.list[at.index]];
-  }, 'Moved');
-  const remove = (id) => commit(() => { const at = find(id); at.list.splice(at.index, 1); if (selected === id) selected = null; }, 'Removed');
-
-  // Add: a container with one allowed type skips the chooser.
+  // ---- Add: a field with one allowed type skips the chooser ----
   const addTo = (parentId, index) => {
     if (editing && !leave()) return;
     const parent = parentId ? find(parentId).block : null;
     const allowed = parent ? [TYPES[parent.type].child] : TOP;
-    if (parent) openGroups.add(parent.id);
     const go = (type) => {
+      const before = snap();
       const b = make(type, Object.fromEntries(Object.keys(TYPES[type].fields).map((k) => [k, ''])));
-      const list = parent ? parent.kids : blocks;
-      history.push({ blocks: clone(blocks), changes });
-      list.splice(index, 0, b);
-      selected = b.id;
-      edit(b.id, true);
+      (parent ? parent.kids : blocks).splice(index, 0, b);
+      if (parent) openGroups.add(parent.id);
+      edit(b.id, before);
     };
     if (allowed.length === 1) return go(allowed[0]);
     const panel = $('#panel'); panel.replaceChildren(el('h2', '', 'Add paragraph'));
     const grid = el('div', 'tiles');
-    allowed.forEach((t) => {
-      const b = el('button', 'tile'); b.append(el('b', '', TYPES[t].label), el('span', '', TYPES[t].desc));
-      b.addEventListener('click', () => go(t)); grid.append(b);
-    });
-    const cancel = el('button', 'btn', 'Cancel'); cancel.addEventListener('click', closePanel);
-    panel.append(grid, el('div', 'actions')); panel.lastChild.append(cancel);
-    panel.classList.add('open');
+    allowed.forEach((t) => { const x = el('button', 'tile'); x.append(el('b', '', TYPES[t].label), el('span', '', TYPES[t].desc)); x.addEventListener('click', () => go(t)); grid.append(x); });
+    const cancel = el('button', 'btn', 'Cancel'); cancel.addEventListener('click', () => { panel.classList.remove('open'); layout(); });
+    const foot = el('div', 'actions'); foot.append(cancel); panel.append(grid, foot);
+    panel.classList.add('open'); layout();
   };
 
-  // ---- Edit panel with live preview ----
+  // ---- The edit panel: the preview follows what is typed ----
   let timer = 0;
-  const edit = (id, temp = false) => {
+  const edit = (id, added = null) => {
     if (editing && editing.block.id !== id && !leave()) return;
-    const at = find(id); const b = at.block;
-    editing = { block: b, orig: clone(b.props), temp, dirty: temp };
+    const b = find(id).block;
+    editing = { block: b, orig: clone(b.props), added, dirty: Boolean(added), before: added || snap() };
     selected = id; render();
     const panel = $('#panel');
-    panel.replaceChildren(el('h2', '', `${temp ? 'Add' : 'Edit'} ${TYPES[b.type].label}`));
+    panel.replaceChildren(el('h2', '', `${added ? 'Add' : 'Edit'} ${TYPES[b.type].label}`));
     Object.entries(TYPES[b.type].fields).forEach(([k, label]) => {
-      const lab = el('label', '', label); const input = el(k === 'body' ? 'textarea' : 'input'); input.value = b.props[k] || '';
+      const input = el(k === 'body' ? 'textarea' : 'input'); input.value = b.props[k] || ''; input.id = `f-${k}`;
       if (k === 'body') input.rows = 4;
-      input.addEventListener('input', () => {
-        b.props[k] = input.value; editing.dirty = true;
-        clearTimeout(timer); timer = setTimeout(render, 400); // debounce, as the module does
-      });
-      panel.append(lab, input);
+      input.addEventListener('input', () => { b.props[k] = input.value; editing.dirty = true; clearTimeout(timer); timer = setTimeout(render, 400); });
+      const lab = el('label', '', label); lab.htmlFor = input.id; panel.append(lab, input);
     });
-    panel.append(el('div', 'live', 'The preview follows what you type (400 ms debounce). Nothing is saved yet.'));
-    const actions = el('div', 'actions');
+    panel.append(el('div', 'live', 'The preview follows what you type (400 ms pause). Nothing is saved yet.'));
+    const foot = el('div', 'actions');
     const save = el('button', 'btn primary', 'Save'); save.dataset.save = '';
     save.addEventListener('click', () => {
-      const wasTemp = editing.temp; const dirty = editing.dirty;
-      if (!wasTemp && dirty) {
-        // The undo step brings back the text from before this edit.
-        const prev = clone(blocks); find(editing.block.id, prev).block.props = editing.orig;
-        history.push({ blocks: prev, changes });
-      }
-      editing = null; panel.classList.remove('open');
-      if (wasTemp || dirty) { changes++; }
-      render(); toast('Saved to the draft');
+      clearTimeout(timer);
+      const e = editing; editing = null; panel.classList.remove('open');
+      if (e.added || e.dirty) { undoStack.push(e.before); redoStack = []; log.push(`${e.added ? 'Added' : 'Edited'} ${titleOf(e.block)}`); toast('Saved to the draft'); }
+      render();
     });
-    const cancel = el('button', 'btn', 'Cancel'); cancel.dataset.cancel = '';
-    cancel.addEventListener('click', () => cancelEdit());
-    actions.append(save, cancel); panel.append(actions);
-    panel.classList.add('open');
-    const first = panel.querySelector('input, textarea'); if (first) first.focus();
+    const cancel = el('button', 'btn', 'Cancel'); cancel.dataset.cancel = ''; cancel.addEventListener('click', cancelEdit);
+    foot.append(save, cancel); panel.append(foot);
+    panel.classList.add('open'); layout();
+    const first = $('input, textarea', panel); if (first) first.focus();
   };
   const cancelEdit = () => {
-    if (!editing) return closePanel();
+    if (!editing) return;
     clearTimeout(timer);
-    if (editing.temp) { const at = find(editing.block.id); at.list.splice(at.index, 1); history.pop(); selected = null; }
+    if (editing.added) { const a = find(editing.block.id); a.list.splice(a.index, 1); selected = null; }
     else editing.block.props = editing.orig;
     editing = null; $('#panel').classList.remove('open'); render();
   };
-  const closePanel = () => { $('#panel').classList.remove('open'); };
-  // Leaving an unsaved form: the browser's own "unsaved changes" question.
+  // Leaving an unsaved form: ask first, then show the saved version again.
   const leave = () => {
     if (editing && editing.dirty && !confirm('You have unsaved changes in this paragraph. Leave anyway?')) return false;
     cancelEdit(); return true;
   };
-  window.addEventListener('beforeunload', (e) => { if (editing && editing.dirty) { e.preventDefault(); } });
+  window.addEventListener('beforeunload', (e) => { if (editing && editing.dirty) e.preventDefault(); });
 
+  // ---- Sidebar chrome: collapse, resize, search, draft ----
+  const setCollapsed = (c) => { opt.collapsed = c; store(); layout(); setTimeout(dirs, 300); };
+  $('#collapse').addEventListener('click', () => setCollapsed(true));
+  $('#openSide').addEventListener('click', () => setCollapsed(false));
+  $('#resizer').addEventListener('pointerdown', (e) => {
+    const bar = e.currentTarget; bar.setPointerCapture(e.pointerId); bar.classList.add('drag');
+    const move = (ev) => { opt.sw = Math.max(260, Math.min(560, ev.clientX - 12)); layout(); };
+    const up = () => { bar.classList.remove('drag'); bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); store(); };
+    bar.addEventListener('pointermove', move); bar.addEventListener('pointerup', up);
+  });
+  $('#search').addEventListener('input', (e) => { query = e.target.value; render(); });
   $('#addTop').addEventListener('click', () => addTo(null, blocks.length));
-  $('#undo').addEventListener('click', () => { if (editing) cancelEdit(); const h = history.pop(); if (h) { blocks = h.blocks; changes = h.changes; selected = null; render(); toast('Undone'); } });
-  $('#discard').addEventListener('click', () => { if (editing) cancelEdit(); blocks = JSON.parse(saved); history = []; changes = 0; selected = null; render(); toast('Draft discarded'); });
-  $('#save').addEventListener('click', () => { if (editing && !leave()) return; saved = JSON.stringify(blocks); history = []; changes = 0; render(); toast('Published (demo)'); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && editing) cancelEdit(); });
+  $('#undo').addEventListener('click', undo);
+  $('#redo').addEventListener('click', redo);
+  $('#discard').addEventListener('click', () => { if (editing) cancelEdit(); blocks = JSON.parse(saved); log = []; undoStack = []; redoStack = []; selected = null; render(); toast('Draft discarded'); });
+  const openSave = (modeless = false) => {
+    if (editing && !leave()) return;
+    $('#changes').replaceChildren(...log.map((t) => el('li', '', t)));
+    modeless ? $('#savedlg').show() : $('#savedlg').showModal();
+  };
+  $('#save').addEventListener('click', () => openSave());
+  $('#savedlg').addEventListener('close', (e) => {
+    if (e.target.returnValue !== 'save') return;
+    saved = JSON.stringify(blocks); log = []; undoStack = []; redoStack = []; render();
+    toast(`Saved (demo)${$('#rev').checked ? ': a new revision was made' : ''}`);
+  });
+
+  // ---- Sizes ----
+  const setSize = (v) => { opt.size = v; pan = { x: 0, y: 0 }; store(); $$('input[name=w]').forEach((r) => { r.checked = r.value === v; }); layout(); setTimeout(dirs, 320); };
+  $$('input[name=w]').forEach((r) => r.addEventListener('change', () => setSize(r.value)));
+
+  // ---- Settings dialog ----
+  const syncSettings = () => {
+    $$('[data-opt]').forEach((b) => { b.checked = Boolean(opt[b.dataset.opt]); });
+  };
+  $('#gear').addEventListener('click', () => { syncSettings(); $('#settings').showModal(); });
+  $$('[data-opt]').forEach((b) => b.addEventListener('change', () => { opt[b.dataset.opt] = b.checked; store(); render(); }));
+  $('#sReset').addEventListener('click', () => { opt = { ...DEFAULTS }; store(); setSize('full'); syncSettings(); render(); });
+
+  // ---- Keyboard ----
+  document.addEventListener('keydown', (e) => {
+    if (document.querySelector('dialog[open]')) return;
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+    const mod = e.ctrlKey || e.metaKey;
+    if (e.key === 'Escape' && editing) { cancelEdit(); return; }
+    if (mod && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+    if (typing || editing || $('#panel').classList.contains('open')) return;
+    const sel = selected ? find(selected) : null;
+    if (e.altKey && sel && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) { e.preventDefault(); move(selected, e.key === 'ArrowUp' ? -1 : 1); return; }
+    if (!opt.shortcuts || mod || e.altKey) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (k === 'j' || k === 'k') {
+      const rows = $$('.row', $('#list')).filter((r) => r.offsetParent);
+      const i = rows.findIndex((r) => r.dataset.row === selected);
+      const next = rows[k === 'j' ? Math.min(rows.length - 1, i + 1) : Math.max(0, i - 1)];
+      if (next) select(next.dataset.row, true);
+    } else if (k === '/') { e.preventDefault(); $('#search').focus(); }
+    else if (sel && k === 'e') edit(selected);
+    else if (sel && k === 'd') duplicate(selected);
+    else if (sel && k === 'm') moveTo(selected);
+    else if (sel && k === 'Delete') remove(selected);
+  });
 
   // ---- Tour ----
-  const typeInto = async (input, text) => {
-    for (const ch of text) { input.value += ch; input.dispatchEvent(new Event('input')); await new Promise((r) => setTimeout(r, 70)); }
+  const typeInto = async (input, text) => { for (const ch of text) { input.value += ch; input.dispatchEvent(new Event('input')); await wait(70); } };
+  const byTitle = (t) => blocks.find((b) => b.props.title === t);
+  const accId = () => byTitle('Frequently asked').id;
+  const cardsB = () => byTitle('Three cards');
+  const pv = (id) => $(`.pv-p[data-id="${id}"]`);
+  const closeDialogs = () => $$('dialog[open]').forEach((d) => d.close('cancel'));
+  const reset = () => {
+    closeDialogs(); if (editing) cancelEdit();
+    blocks = JSON.parse(saved); log = []; undoStack = []; redoStack = []; selected = null; active = null; query = ''; $('#search').value = '';
+    opt = { ...DEFAULTS }; pan = { x: 0, y: 0 }; store(); setSize('full'); render();
   };
-  const cardsEl = () => $(`.pv-p[data-id="${cards.id}"]`);
-  const accId = () => blocks[3].id;
+  // The tour's dialogs are not modal, so its card stays usable on top.
   const STEPS = [
-    { title: 'Welcome', text: 'A Gutenberg-like visual editor for Paragraphs. This page is a static mock of it; click along or press Next.', run() { reset(); } },
-    { title: 'Structure and preview', text: 'The sidebar shows the paragraph tree. The page on the right is the real theme. Click a paragraph on either side to select it.', target: '.side', run() { select(blocks[1].id); } },
-    { title: 'Tools and + buttons', text: 'Hover a paragraph: tools appear above it, and a + on each side to add a paragraph there. The Cards use left/right +, stacked paragraphs use top/bottom.', target: () => $(`.pv-p[data-id="${blocks[1].id}"]`), run() { setActive(blocks[1].id); } },
-    { title: 'Instant preview', text: 'Editing opens a panel. As you type, the preview follows after a 400 ms pause. Watch the hero title.', target: '#panel', async run() { edit(blocks[0].id); await new Promise((r) => setTimeout(r, 500)); await typeInto($('#panel input'), ' - live!'); } },
-    { title: 'Leave without saving', text: 'Cancel, or open another paragraph, and the preview goes back to the saved version. The browser asks first when there are unsaved changes.', target: '.page', run() { cancelEdit(); } },
-    { title: 'Empty container', text: 'A container with no items shows a soft placeholder, only in the editor. It is never rendered on the published page.', target: () => $(`.pv-p[data-id="${accId()}"] .empty`), run() { selected = null; setActive(null); render(); $(`.pv-p[data-id="${accId()}"]`).scrollIntoView({ block: 'center' }); } },
-    { title: 'Add the first item', text: 'Only one type is allowed in an accordion, so the type chooser is skipped and the form opens straight away.', target: '#panel', async run() { addTo(accId(), 0); await new Promise((r) => setTimeout(r, 400)); await typeInto($('#panel input'), 'What is this?'); } },
-    { title: 'Side by side', text: 'Cards sit next to each other, so + goes left and right. It is detected from the layout; a theme can force it with data-pve-direction.', target: () => cardsEl(), run() { cancelEdit(); const k = cards.kids[0]; cardsEl().scrollIntoView({ block: 'center' }); setActive(k.id); } },
-    { title: 'Draft, undo, save', text: 'Changes are kept in a draft. Undo steps back, Discard drops the draft, Save publishes. Try the + buttons yourself.', target: '#banner', run() { setActive(null); if (!changes) commit(() => { blocks[1].props.body += ' (edited)'; }); } },
+    { title: 'Welcome', text: 'A Gutenberg-like visual editor for Paragraphs. This is a static mock of the real thing: click along, or press Next.', run: reset },
+    { title: 'Structure and preview', text: 'The sidebar shows the paragraph tree; the page is the real theme. Click a paragraph on either side to select it. The sidebar floats above the preview, which slides to keep the selection visible.', target: '#side', run: () => select(blocks[1].id) },
+    { title: 'Preview size', text: 'Desktop, Tablet (768 px) or Phone (390 px). The page keeps its real width and breakpoints, so the cards stack on a phone.', target: '#sizes', async run() { setSize('tablet'); await wait(900); setSize('phone'); await wait(900); } },
+    { title: 'Zoom and pan', text: 'Zoom with − / + (or Ctrl + scroll, or pinch) and move the page like a canvas: hold Space and drag, middle-drag, or swipe sideways. Click the percentage to go back to 100%; Fit scales the page into the free space. The ? explains it all.', target: '#viewbar', async run() { setSize('full'); zoomStep(-1); await wait(500); zoomStep(-1); await wait(700); panBy(120, 0); await wait(700); panBy(-120, 0); await wait(500); setZoom('fit'); await wait(900); setZoom(1); } },
+    { title: 'Collapse and resize', text: 'Hide the sidebar with « and bring it back with ». Drag its right edge to resize it. The preview gets the room.', target: '#collapse', async run() { setSize('full'); await wait(500); setCollapsed(true); await wait(1100); setCollapsed(false); await wait(400); } },
+    { title: 'Viewing options', text: 'The gear opens the settings: dim the rest of the page, type labels, show unpublished paragraphs faded, scrolling and single-key shortcuts. They are kept per browser.', target: '#settings', run() { syncSettings(); $('#settings').show(); } },
+    { title: 'Tools and + buttons', text: 'Hover a paragraph: tools appear above it, and a + on each side adds a paragraph there.', target: () => pv(blocks[1].id), run() { select(blocks[1].id); setActive(blocks[1].id); } },
+    { title: 'All paragraph actions', text: 'Edit, move up/down, Move to…, duplicate, publish/unpublish and remove, on the sidebar row and in the preview. Up/down are disabled at the ends of a list.', target: () => $('.row.sel .tools'), run() { select(blocks[1].id); } },
+    { title: 'Move to…', text: 'The keyboard alternative to drag and drop: a list of the places this paragraph may go. Dragging rows in the sidebar works too, where the type is allowed.', target: '#moveto', run() { const k = cardsB().kids[0]; select(k.id); moveTo(k.id, true); } },
+    { title: 'Publish and unpublish', text: 'Unpublished paragraphs stay in the editor, faded and struck through, and are hidden from visitors. A viewing option hides them from this preview as well.', target: () => $('.row.sel'), async run() { select(blocks[1].id); await wait(200); togglePub(blocks[1].id); } },
+    { title: 'Instant preview', text: 'Editing opens a panel. As you type, the preview follows after a short pause. Watch the hero title.', target: '#panel', async run() { edit(blocks[0].id); await wait(500); await typeInto($('#panel input'), ' - live!'); } },
+    { title: 'Leave without saving', text: 'Cancel, or open another paragraph, and the preview goes back to the saved version. The browser asks first when there are unsaved changes.', target: '#frame', run: () => cancelEdit() },
+    { title: 'Empty container', text: 'A container without items shows a soft, editor-only placeholder. It is never rendered on the published page.', target: () => $('.empty'), run() { select(null); const n = $('.empty'); if (n) n.scrollIntoView({ block: 'center' }); } },
+    { title: 'Add the first item', text: 'Only one type is allowed in this accordion, so the type chooser is skipped and the form opens straight away.', target: '#panel', async run() { addTo(accId(), 0); await wait(400); await typeInto($('#panel input'), 'What is this?'); } },
+    { title: 'Side by side', text: 'Cards sit next to each other, so + goes left and right. This is detected from the layout (try the Phone size); a theme can force it with data-pve-direction.', target: () => pv(cardsB().id), run() { cancelEdit(); const k = cardsB().kids[0]; pv(cardsB().id).scrollIntoView({ block: 'center' }); setActive(k.id); } },
+    { title: 'Draft, undo and save', text: 'Changes go to a shared draft: undo/redo step through them, Discard drops the draft. Save opens one dialog with the change list and revision options.', target: '#savedlg', run() { select(null); setActive(null); if (!log.length) togglePub(blocks[1].id); openSave(true); } },
+    { title: 'Your turn', text: 'Try it: add paragraphs with the + buttons, drag rows, search, zoom and pan the page, press J / K / E / D / M, Alt+↑↓ and Ctrl+Z. Open the gear for the full list.', run: closeDialogs },
   ];
   let step = 0;
-  const reset = () => { if (editing) cancelEdit(); blocks = JSON.parse(saved); history = []; changes = 0; selected = null; active = null; render(); };
   const showStep = async (n) => {
     step = Math.max(0, Math.min(STEPS.length - 1, n));
-    document.querySelectorAll('.tour-hl').forEach((x) => x.classList.remove('tour-hl'));
-    if (editing) cancelEdit();
-    const s = STEPS[step];
-    drawTour(s);
+    $$('.tour-hl').forEach((x) => x.classList.remove('tour-hl'));
+    closeDialogs(); if (editing) cancelEdit();
+    if ($('#zoomhelp').matches(':popover-open')) $('#zoomhelp').hidePopover();
+    const s = STEPS[step]; drawTour(s);
     if (s.run) await s.run();
     const t = typeof s.target === 'function' ? s.target() : s.target && $(s.target);
     if (t) t.classList.add('tour-hl');
   };
   const drawTour = (s) => {
-    const t = $('#tour');
     const nav = el('div', 'nav');
     const back = el('button', 'btn', 'Back'); back.disabled = step === 0; back.addEventListener('click', () => showStep(step - 1));
-    const next = el('button', 'btn primary', step === STEPS.length - 1 ? 'Finish' : 'Next');
-    next.addEventListener('click', () => (step === STEPS.length - 1 ? endTour() : showStep(step + 1)));
+    const last = step === STEPS.length - 1;
+    const next = el('button', 'btn primary', last ? 'Finish' : 'Next'); next.addEventListener('click', () => (last ? endTour() : showStep(step + 1)));
     const skip = el('button', 'btn', 'Skip'); skip.addEventListener('click', endTour);
     nav.append(back, next, el('span', 'grow', `${step + 1} / ${STEPS.length}`), skip);
-    t.replaceChildren(el('h3', '', s.title), el('p', '', s.text), nav);
+    $('#tour').replaceChildren(el('h3', '', s.title), el('p', '', s.text), nav);
   };
-  const endTour = () => { document.querySelectorAll('.tour-hl').forEach((x) => x.classList.remove('tour-hl')); $('#tour').hidden = true; };
+  const endTour = () => { $$('.tour-hl').forEach((x) => x.classList.remove('tour-hl')); $('#tour').hidden = true; };
 
-  render();
+  setSize(opt.size); render();
   showStep(0);
 })();
 </script>
